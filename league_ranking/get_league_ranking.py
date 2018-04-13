@@ -41,7 +41,7 @@ def _get_splatoon_ranking(match_date_uri):
         SPLATOON2_LEAGUE_MATCH_RANKING_URI.format(match_date_uri),
         cookies=COOKIES)
     if r.status_code == 403 and r.json().get('code') == AUTHENTICATION_ERROR:
-        print("error: authentication Error. make sure your iksm_session.")
+        print("error: authentication error. make sure your iksm_session.")
         sys.exit(1)
     return r.text
 
