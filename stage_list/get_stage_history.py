@@ -74,7 +74,7 @@ def _make_match_dict(match_detail, match_date):
 def _get_nawabari_history(pattern, search_string):
     match = pattern.search(search_string)
     if match:
-        stages = match.group(1).split("、")
+        stages = [{"name": s} for s in match.group(1).split("、")]
         return {"mode": "ナワバリ", "rule": "ナワバリ", "stages": stages}
 
 
@@ -82,7 +82,7 @@ def _get_gachi_history(pattern, search_string):
     match = pattern.search(search_string)
     if match:
         rule = _normalize_rule(match.group(1))
-        stages = match.group(2).split("、")
+        stages = [{"name": s} for s in match.group(2).split("、")]
         return {"mode": "ガチマッチ", "rule": rule, "stages": stages}
     return None
 
@@ -91,7 +91,7 @@ def _get_league_history(pattern, search_string):
     match = pattern.search(search_string)
     if match:
         rule = _normalize_rule(match.group(1))
-        stages = match.group(2).split("、")
+        stages = [{"name": s} for s in match.group(2).split("、")]
         return {"mode": "リーグマッチ", "rule": rule, "stages": stages}
     return None
 
