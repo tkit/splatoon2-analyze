@@ -19,6 +19,7 @@ from html.parser import HTMLParser
 JST = timezone(timedelta(hours=+9), 'JST')
 STAGE_HISTORY_JSON = 'stage_history.json'
 
+
 class MyHTMLParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -80,7 +81,7 @@ def _get_nawabari_history(pattern, search_string):
 def _get_gachi_history(pattern, search_string):
     match = pattern.search(search_string)
     if match:
-        rule = match.group(1)
+        rule = _normalize_rule(match.group(1))
         stages = match.group(2).split("、")
         return {"mode": "ガチマッチ", "rule": rule, "stages": stages}
     return None
@@ -89,10 +90,19 @@ def _get_gachi_history(pattern, search_string):
 def _get_league_history(pattern, search_string):
     match = pattern.search(search_string)
     if match:
-        rule = match.group(1)
+        rule = _normalize_rule(match.group(1))
         stages = match.group(2).split("、")
         return {"mode": "リーグマッチ", "rule": rule, "stages": stages}
     return None
+
+
+def _normalize_rule(rule):
+    """
+  「ガチホコ」と「ガチホコバトル」で表記ゆれがあるため、「ガチホコ」に統一
+  """
+    if rule == 'ガチホコバトル':
+        return 'ガチホコ'
+    return rule
 
 
 if __name__ == '__main__':
@@ -120,7 +130,7 @@ if __name__ == '__main__':
 
     stage_history = []
 
-    for i in progressbar.progressbar(parsed_data,redirect_stdout=True):
+    for i in progressbar.progressbar(parsed_data, redirect_stdout=True):
         match_date = _get_match_date(pattern_date, i)
         match = _get_nawabari_history(pattern_nawabari, i['data'])
         if match and match_date:
