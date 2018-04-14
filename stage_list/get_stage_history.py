@@ -54,8 +54,8 @@ def _html_parse(source_file):
 def _get_match_date(pattern, data):
     match_date = pattern.search(data['data'])
     if match_date:
-        dt = datetime.strptime('{} +0900'.format(match_date.group()),
-                               "%m/%d %H:%M %z")
+        dt = datetime.strptime('{}'.format(match_date.group()), "%m/%d %H:%M")
+        dt = dt.astimezone(tz=JST)
         dt = dt.replace(year=data['tweetdate'].year)
         return dt
     return None
@@ -96,6 +96,14 @@ def _get_league_history(pattern, search_string):
     return None
 
 
+def _get_fes_history(pattern, search_string):
+    match = pattern.search(search_string)
+    if match:
+        stages = [{"name": m} for m in list(match.group(1, 2, 3))]
+        return {"mode": "フェスマッチ", "rule": "ナワバリ", "stages": stages}
+    return None
+
+
 def _normalize_rule(rule):
     """
   「ガチホコ」と「ガチホコバトル」で表記ゆれがあるため、「ガチホコ」に統一
@@ -128,6 +136,9 @@ if __name__ == '__main__':
     regex_league = r'^▼リーグ：(\w+)\n(\S+)'
     pattern_league = re.compile(regex_league, re.MULTILINE)
 
+    regex_fes = r'▼フェスマッチ\n(\S+)\n(\S+)\n(\S+)'
+    pattern_fes = re.compile(regex_fes, re.MULTILINE)
+
     stage_history = []
 
     for i in progressbar.progressbar(parsed_data, redirect_stdout=True):
@@ -139,6 +150,9 @@ if __name__ == '__main__':
         if match and match_date:
             stage_history.append(_make_match_dict(match, match_date))
         match = _get_league_history(pattern_league, i['data'])
+        if match and match_date:
+            stage_history.append(_make_match_dict(match, match_date))
+        match = _get_fes_history(pattern_fes, i['data'])
         if match and match_date:
             stage_history.append(_make_match_dict(match, match_date))
 
