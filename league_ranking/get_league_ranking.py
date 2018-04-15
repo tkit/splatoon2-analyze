@@ -20,7 +20,7 @@ from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=+9), 'JST')
 DEFAULT_COUNT_DAYS_AGO = 3
-SPLATOON2_LEAGUE_MATCH_RANKING_URI = 'https://app.splatoon2.nintendo.net/api/league_match_ranking/{}/ALL'
+SPLATOON2_LEAGUE_MATCH_RANKING_URI = 'https://app.splatoon2.nintendo.net/api/league_match_ranking/{}/JP'
 FIRST_TIME_OF_LEAGUE_MATCH = datetime(
     year=2017,
     month=7,
