@@ -33,12 +33,16 @@ FIRST_TIME_OF_LEAGUE_MATCH = datetime(
 
 MIN_SLEEP_SEC = 2
 MAX_SLEEP_SEC = 5
+AUTHENTICATION_ERROR='AUTHENTICATION_ERROR'
 
 
 def _get_splatoon_ranking(match_date_uri):
     r = requests.get(
         SPLATOON2_LEAGUE_MATCH_RANKING_URI.format(match_date_uri),
         cookies=COOKIES)
+    if r.status_code == 403 and r.json().get('code') == AUTHENTICATION_ERROR:
+        print("error: authentication error. make sure your iksm_session.")
+        sys.exit(1)
     return r.text
 
 
