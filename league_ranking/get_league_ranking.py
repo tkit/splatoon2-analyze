@@ -33,7 +33,7 @@ FIRST_TIME_OF_LEAGUE_MATCH = datetime(
 
 MIN_SLEEP_SEC = 2
 MAX_SLEEP_SEC = 5
-AUTHENTICATION_ERROR='AUTHENTICATION_ERROR'
+AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR'
 
 
 def _get_splatoon_ranking(match_date_uri):
@@ -47,9 +47,12 @@ def _get_splatoon_ranking(match_date_uri):
 
 
 def _make_ranking_json(json_file, uri_time):
-    with open(json_file, 'w') as f:
-        f.write(_get_splatoon_ranking(uri_time))
-    print('processed:{}'.format(json_file))
+    try:
+        with open(json_file, 'w') as f:
+            f.write(_get_splatoon_ranking(uri_time))
+        print('processed:{}'.format(json_file))
+    except:
+        print("error: unexpected error is occured when writing json file.")
 
 
 def _get_ranking_date_list():
@@ -93,9 +96,9 @@ if __name__ == '__main__':
     else:
         print("error: environment IKSM_SESSION is required")
         sys.exit(1)
-    
+
     now = datetime.now(timezone.utc)
-    
+
     if len(sys.argv) == 1:  # default
         start_time = (now - timedelta(days=DEFAULT_COUNT_DAYS_AGO)).replace(
             hour=0, minute=0, second=0, microsecond=0)
@@ -111,11 +114,10 @@ if __name__ == '__main__':
     else:
         start_time = (now - timedelta(days=int(sys.argv[1]))).replace(
             hour=0, minute=0, second=0, microsecond=0)
-    
+
     if FIRST_TIME_OF_LEAGUE_MATCH > start_time:
         start_time = FIRST_TIME_OF_LEAGUE_MATCH
     print('start time is {}'.format(start_time.strftime('%y%m%d%H')))
 
     ranking_date_list = _get_ranking_date_list()
     _retrieve_ranking(ranking_date_list)
-
