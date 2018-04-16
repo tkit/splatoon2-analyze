@@ -24,6 +24,12 @@ docker-compose up
 sh setup_es_templates.sh
 ```
 
+### python setup
+
+```
+pip install -r requirements.txt
+```
+
 # how to run
 
 ## bulk data
