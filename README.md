@@ -5,6 +5,7 @@ splatoon2の様々なデータを可視化したり解析するためのスク�
 詳細は各ディレクトリ配下のREADMEをご覧ください。
 
 * [league_ranking](./league_ranking/README.md)  
+* [festival_ranking](./festival_ranking/README.md)
 * [stage_list](./stage_list/README.md)
 * [visualize_splatoon](./visualize_splatoon/README.md)
 
