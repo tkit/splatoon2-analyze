@@ -6,6 +6,7 @@ splatoon2の様々なデータを可視化したり解析するためのスク�
 
 * [league_ranking](./league_ranking/README.md)  
 * [stage_list](./stage_list/README.md)
+* [visualize_splatoon](./visualize_splatoon/README.md)
 
 # requirements
 
