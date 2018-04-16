@@ -42,12 +42,8 @@ def _convert_stage_dict(list):
     stage_dict = {}
     for l in list:
         if 'mode' in l and l['mode'] == "リーグマッチ":
-            start_timestamp = datetime.strptime(
-                l['start_time'], '%Y/%m/%d %H:%M %z').timestamp()
-            stage_dict[str(int(start_timestamp))] = {
-                "rule": l['rule'],
-                "stages": l['stages']
-            }
+            start_timestamp = datetime.strptime(l['start_time'], '%Y/%m/%d %H:%M %z').timestamp()
+            stage_dict[str(int(start_timestamp))] = {"rule": l['rule'], "stages": l['stages']}
         else:
             continue
     return stage_dict
@@ -67,25 +63,25 @@ def _make_bulk_data(stage_info, ranking_data, start_time, league_type):
     dt = datetime.fromtimestamp(int(start_time), JST)
     actions = [{
         "_index":
-        "splatoon_league_ranking",
+            "splatoon_league_ranking",
         "_type":
-        "league_ranking_history",
+            "league_ranking_history",
         "_id":
-        '{}_{}_{}'.format(start_time, league_type, d['rank']),
+            '{}_{}_{}'.format(start_time, league_type, d['rank']),
         "league_ranking_region":
-        "JP",
+            "JP",
         "start_time":
-        dt,
+            dt,
         "league_type":
-        league_type,
+            league_type,
         "rule":
-        stage_info['rule'],
+            stage_info['rule'],
         "stages":
-        stage_info['stages'],
+            stage_info['stages'],
         "rank":
-        d['rank'],
+            d['rank'],
         "point":
-        d['point'],
+            d['point'],
         "tag_members": [{
             "main_weapon": t['weapon']['name'],
             "sub_weapon": t['weapon']['sub']['name'],
@@ -100,18 +96,17 @@ if __name__ == '__main__':
     stage_dict = _convert_stage_dict(stage_list)
     p = Path(LEAGUE_RANKING_DIR)
     actions = []
-    for json_file in progressbar.progressbar(list(p.glob(LEAGUE_RANKING_FILE_PATTERN)),redirect_stdout=True):
+    for json_file in progressbar.progressbar(
+            list(p.glob(LEAGUE_RANKING_FILE_PATTERN)), redirect_stdout=True):
         data = _load_league_ranking_file(json_file)
         if "code" in data and data['code'] == "NOT_FOUND_ERROR":
             continue
         if not "start_time" in data:
-            print("skipped because start_time isn't contained: {}".format(
-                json_file))
+            print("skipped because start_time isn't contained: {}".format(json_file))
             continue
         start_time = str(data['start_time'])
         if not 'league_type' in data or not 'key' in data['league_type']:
-            print("skipped because league_type.key isn't contained: {}".format(
-                json_file))
+            print("skipped because league_type.key isn't contained: {}".format(json_file))
             continue
         league_type = data['league_type']['key']
         if not start_time in stage_dict:
@@ -119,6 +114,6 @@ if __name__ == '__main__':
                 datetime.fromtimestamp(int(start_time), JST)))
             continue
 
-        actions = _make_bulk_data(stage_dict[start_time], data['rankings'],
-                                  start_time, league_type)
+        actions = _make_bulk_data(stage_dict[start_time], data['rankings'], start_time,
+                                  league_type)
         _bulk_es_data(es, actions)

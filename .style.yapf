@@ -1,0 +1,7 @@
+[style]
+based_on_style = google
+column_limit = 99
+indent_dictionary_value=true
+
+[flake8]
+max-line-length = 99

@@ -22,14 +22,7 @@ JST = timezone(timedelta(hours=+9), 'JST')
 DEFAULT_COUNT_DAYS_AGO = 3
 SPLATOON2_LEAGUE_MATCH_RANKING_URI = 'https://app.splatoon2.nintendo.net/api/league_match_ranking/{}/JP'
 FIRST_TIME_OF_LEAGUE_MATCH = datetime(
-    year=2017,
-    month=7,
-    day=21,
-    hour=10,
-    minute=0,
-    second=0,
-    microsecond=0,
-    tzinfo=timezone.utc)
+    year=2017, month=7, day=21, hour=10, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
 
 MIN_SLEEP_SEC = 2
 MAX_SLEEP_SEC = 5
@@ -37,9 +30,7 @@ AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR'
 
 
 def _get_splatoon_ranking(match_date_uri):
-    r = requests.get(
-        SPLATOON2_LEAGUE_MATCH_RANKING_URI.format(match_date_uri),
-        cookies=COOKIES)
+    r = requests.get(SPLATOON2_LEAGUE_MATCH_RANKING_URI.format(match_date_uri), cookies=COOKIES)
     if r.status_code == 403 and r.json().get('code') == AUTHENTICATION_ERROR:
         print("error: authentication error. make sure your iksm_session.")
         sys.exit(1)
@@ -68,8 +59,7 @@ def _get_ranking_date_list():
 
 
 def _retrieve_ranking(ranking_date_list):
-    for uri_time in progressbar.progressbar(
-            ranking_date_list, redirect_stdout=True):
+    for uri_time in progressbar.progressbar(ranking_date_list, redirect_stdout=True):
         # if json file already exists, skip processing
         json_file = '{}.json'.format(uri_time)
         if os.path.isfile(json_file):

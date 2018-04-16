@@ -21,6 +21,7 @@ STAGE_HISTORY_JSON = 'stage_history.json'
 
 
 class MyHTMLParser(HTMLParser):
+
     def __init__(self):
         HTMLParser.__init__(self)
         self.tweetbody = False
@@ -33,8 +34,7 @@ class MyHTMLParser(HTMLParser):
             for attr in attrs:
                 if attr[0] == 'rel':
                     tweetdate = attr[1]
-                    dt = datetime.strptime(tweetdate,
-                                           "%a %b %d %H:%M:%S %z %Y")
+                    dt = datetime.strptime(tweetdate, "%a %b %d %H:%M:%S %z %Y")
                     self.tweetdate = dt.astimezone(tz=JST)
 
     def handle_data(self, data):
