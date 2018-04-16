@@ -9,6 +9,7 @@ usage: python bulk_league_ranking.py
 
 import json
 import sys
+import progressbar
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from elasticsearch import Elasticsearch, helpers, ElasticsearchException
@@ -52,7 +53,7 @@ def _convert_stage_dict(list):
     return stage_dict
 
 
-def _load_league_ranking_file(file_name):
+def _load_league_ranking_file(json_file):
     try:
         with open(json_file, 'r') as f:
             return json.load(f)
@@ -99,7 +100,7 @@ if __name__ == '__main__':
     stage_dict = _convert_stage_dict(stage_list)
     p = Path(LEAGUE_RANKING_DIR)
     actions = []
-    for json_file in p.glob(LEAGUE_RANKING_FILE_PATTERN):
+    for json_file in progressbar.progressbar(list(p.glob(LEAGUE_RANKING_FILE_PATTERN)),redirect_stdout=True):
         data = _load_league_ranking_file(json_file)
         if "code" in data and data['code'] == "NOT_FOUND_ERROR":
             continue
