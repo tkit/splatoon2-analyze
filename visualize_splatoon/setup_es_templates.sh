@@ -156,7 +156,7 @@ curl -XPUT 'localhost:9200/_template/splatoon_festival?pretty' -H 'Content-Type:
             }
           }
         },
-        "updated_time": {"type": "date"},
+        "end_time": {"type": "date"},
         "name": {
           "type": "text",
           "fields": {

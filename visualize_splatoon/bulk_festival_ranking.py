@@ -41,7 +41,7 @@ def _load_festival_ranking_file(jeson_file):
         return None
 
 
-def _make_bulk_data(ranking_data, updated_time, fes_no):
+def _make_bulk_data(ranking_data, end_time):
     actions = []
     for team in ["alpha", "bravo"]:
         actions.extend([{
@@ -50,11 +50,11 @@ def _make_bulk_data(ranking_data, updated_time, fes_no):
             "_type":
                 "festival_ranking_history",
             "_id":
-                '{}_{}_{}'.format(fes_no, team, d['order']),
+                '{}_{}_{}'.format(end_time, team, d['order']),
             "team":
                 team,
-            "updated_time":
-                updated_time,
+            "end_time":
+                end_time,
             "name":
                 d['info']['nickname'],
             "score":
@@ -106,9 +106,7 @@ if __name__ == '__main__':
                 list) and not "updated_time" in data['rankings']['alpha'][0]:
             print("skipped because this data isn't formatted structure: {}".format(json_file))
             continue
-        fes_no = int(str(json_file.name).split(".")[0])
-        updated_time = datetime.fromtimestamp(
-            int(data['rankings']['alpha'][0]['updated_time']), JST)
-        updated_time = updated_time.replace(hour=0, minute=0, second=0, microsecond=0)
-        actions = _make_bulk_data(data['rankings'], updated_time, fes_no)
+        end_time = int(str(json_file.name).split(".")[0])
+        end_time = datetime.fromtimestamp(int(end_time), JST)
+        actions = _make_bulk_data(data['rankings'], end_time)
         _bulk_es_data(es, actions)

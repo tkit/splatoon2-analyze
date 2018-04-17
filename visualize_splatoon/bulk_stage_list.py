@@ -11,21 +11,20 @@ JSON_FILE = "../stage_list/stage_history.json"
 def _bulk_es(data):
     actions = [{
         "timestamp":
-        datetime.strptime(d['start_time'], '%Y/%m/%d %H:%M %z'),
+            datetime.strptime(d['start_time'], '%Y/%m/%d %H:%M %z'),
         "mode":
-        d['mode'],
+            d['mode'],
         "rule":
-        d['rule'],
+            d['rule'],
         "stages":
-        d['stages'],
+            d['stages'],
         "_index":
-        "splatoon_stages",
+            "splatoon_stages",
         "_type":
-        "stage_history",
+            "stage_history",
         "_id":
-        '{}_{}'.format(
-            datetime.strptime(d['start_time'],
-                              '%Y/%m/%d %H:%M %z').timestamp(), d['mode'])
+            '{}_{}'.format(
+                datetime.strptime(d['start_time'], '%Y/%m/%d %H:%M %z').timestamp(), d['mode'])
     } for d in data]
     helpers.bulk(es, actions)
 
