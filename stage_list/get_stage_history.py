@@ -106,10 +106,10 @@ def _get_fes_history(pattern, search_string):
 
 def _normalize_rule(rule):
     """
-  「ガチホコ」と「ガチホコバトル」で表記ゆれがあるため、「ガチホコ」に統一
+  「ガチホコ」と「ガチホコバトル」で表記ゆれがあるため、「ガチホコバトル」に統一
   """
-    if rule == 'ガチホコバトル':
-        return 'ガチホコ'
+    if rule == 'ガチホコ':
+        return 'ガチホコバトル'
     return rule
 
 
