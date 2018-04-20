@@ -17,7 +17,7 @@ from datetime import datetime, timezone, timedelta
 from html.parser import HTMLParser
 
 JST = timezone(timedelta(hours=+9), 'JST')
-STAGE_HISTORY_JSON = 'stage_history.json'
+STAGE_HISTORY_JSON_PATTERN = 'stage_history_{}.json'
 
 
 class MyHTMLParser(HTMLParser):
@@ -113,15 +113,7 @@ def _normalize_rule(rule):
     return rule
 
 
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("error: source file is required")
-        sys.exit(1)
-    source_file = sys.argv[1]
-    if os.path.isfile(source_file) == False:
-        print("error: source file is not found: {}".format(source_file))
-        sys.exit(1)
-
+def _make_stage_history(source_file):
     parsed_data = _html_parse(source_file)
 
     regex_date = r'\d{2}/\d{2}\s\d{2}:\d{2}'
@@ -139,22 +131,46 @@ if __name__ == '__main__':
     regex_fes = r'▼フェスマッチ\n(\S+)\n(\S+)\n(\S+)'
     pattern_fes = re.compile(regex_fes, re.MULTILINE)
 
-    stage_history = []
+    stage_history = {}
 
     for i in progressbar.progressbar(parsed_data, redirect_stdout=True):
         match_date = _get_match_date(pattern_date, i)
+        if not match_date:
+            continue
+        key = '{0:04d}{1:02d}'.format(match_date.year, match_date.month)
+        if not key in stage_history:
+            stage_history[key] = []
         match = _get_nawabari_history(pattern_nawabari, i['data'])
-        if match and match_date:
-            stage_history.append(_make_match_dict(match, match_date))
+        if match:
+            stage_history[key].append(_make_match_dict(match, match_date))
         match = _get_gachi_history(pattern_gachi, i['data'])
-        if match and match_date:
-            stage_history.append(_make_match_dict(match, match_date))
+        if match:
+            stage_history[key].append(_make_match_dict(match, match_date))
         match = _get_league_history(pattern_league, i['data'])
-        if match and match_date:
-            stage_history.append(_make_match_dict(match, match_date))
+        if match:
+            stage_history[key].append(_make_match_dict(match, match_date))
         match = _get_fes_history(pattern_fes, i['data'])
-        if match and match_date:
-            stage_history.append(_make_match_dict(match, match_date))
+        if match:
+            stage_history[key].append(_make_match_dict(match, match_date))
 
-        with open(STAGE_HISTORY_JSON, 'w') as f:
-            f.write(json.dumps(stage_history))
+    return stage_history
+
+
+def _save_json(stage_history):
+    for yyyymm in progressbar.progressbar(stage_history.keys(), redirect_stdout=True):
+        output_json = STAGE_HISTORY_JSON_PATTERN.format(yyyymm)
+        with open(output_json, 'w') as f:
+            f.write(json.dumps(stage_history[yyyymm]))
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("error: source file is required")
+        sys.exit(1)
+    source_file = sys.argv[1]
+    if os.path.isfile(source_file) == False:
+        print("error: source file is not found: {}".format(source_file))
+        sys.exit(1)
+
+    stage_history = _make_stage_history(source_file)
+    _save_json(stage_history)

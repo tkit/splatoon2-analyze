@@ -70,7 +70,7 @@ def _retrieve_ranking(festival_history):
     for fes in progressbar.progressbar(festival_history, redirect_stdout=True):
         fes_uri_part = fes['festival_id']
         # if json file already exists, skip processing
-        json_file = '{}.json'.format(fes['end_time'])
+        json_file = 'festival_ranking_{}.json'.format(fes['end_time'])
         if os.path.isfile(json_file):
             try:
                 with open(json_file, 'r') as f:

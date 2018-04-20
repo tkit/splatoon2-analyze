@@ -16,7 +16,7 @@ from elasticsearch import Elasticsearch, helpers, ElasticsearchException
 
 ELASTICSEARCH_URL = "localhost:9200"
 FESTIVAL_RANKING_DIR = "../festival_ranking"
-FESTIVAL_RANKING_FILE_PATTERN = "*.json"
+FESTIVAL_RANKING_FILE_PATTERN = "festival_ranking_*.json"
 
 es = Elasticsearch(ELASTICSEARCH_URL)
 JST = timezone(timedelta(hours=+9), 'JST')

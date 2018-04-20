@@ -1,3 +1,4 @@
 league_ranking/*.json
 festival_ranking/*.json
+stage_list/*.json
 .DS_store
