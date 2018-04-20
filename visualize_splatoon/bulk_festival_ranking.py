@@ -31,7 +31,7 @@ def _bulk_es_data(es, actions):
         sys.exit(1)
 
 
-def _load_festival_ranking_file(jeson_file):
+def _load_festival_ranking_file(json_file):
     try:
         with open(json_file, 'r') as f:
             return json.load(f)
