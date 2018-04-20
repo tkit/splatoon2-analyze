@@ -21,3 +21,18 @@ python get_festival_ranking.py
 # caution
 
 * 高負荷アクセスを防ぐため、sleepが入っています。約6000件(約7ヶ月分)の取得で6hほどかかります。
+
+# another way (use Docker)
+
+## build
+
+```
+docker build -t splatoon_festival_ranking .
+```
+
+## run
+
+```
+docker run --rm --name festival_ranking -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app splatoon_festival_ranking:latest
+```
+

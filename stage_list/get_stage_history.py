@@ -55,7 +55,7 @@ def _get_match_date(pattern, data):
     match_date = pattern.search(data['data'])
     if match_date:
         dt = datetime.strptime('{}'.format(match_date.group()), "%m/%d %H:%M")
-        dt = dt.astimezone(tz=JST)
+        dt = dt.replace(tzinfo=JST)
         dt = dt.replace(year=data['tweetdate'].year)
         return dt
     return None

@@ -30,3 +30,17 @@ python get_league_ranking.py <days>
 
 * 高負荷アクセスを防ぐため、sleepが入っています。約6000件(約7ヶ月分)の取得で6hほどかかります。
 * リージョンは日本地域のみです。(マッピングするステージ情報がおそらく日本地域のみしか取得できないため)
+
+# another way (using Docker)
+
+## build
+
+```
+docker build -t splatoon_league_ranking .
+```
+
+## run
+
+```
+docker run --rm --name league_ranking -v $PWD:/app splatoon_league_ranking:latest
+```

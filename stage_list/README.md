@@ -20,3 +20,17 @@ python get_stage_list.py <source_file>
 `source_file` にはTwimeMachineから保存したHTMLのソースを指定します。
 
 結果は同ディレクトリ内に `stage_list.json` という形で保存されます。
+
+# another way (use Docker)
+
+## build
+
+```
+docker build -t splatoon_stage_history .
+```
+
+## run
+
+```
+docker run --rm --name stage_history -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app splatoon_stage_history:latest <source_file>
+```
