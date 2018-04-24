@@ -106,7 +106,7 @@ if __name__ == '__main__':
                 list) and not "updated_time" in data['rankings']['alpha'][0]:
             print("skipped because this data isn't formatted structure: {}".format(json_file))
             continue
-        end_time = int(str(json_file.name).split(".")[0])
+        end_time = int(str(json_file.name).split(".")[0].split("_")[2])
         end_time = datetime.fromtimestamp(int(end_time), JST)
         actions = _make_bulk_data(data['rankings'], end_time)
         _bulk_es_data(es, actions)
