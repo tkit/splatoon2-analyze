@@ -16,32 +16,27 @@ import random
 import progressbar
 import os
 import sys
+from pathlib import Path
+import splatoon
 from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=+9), 'JST')
 DEFAULT_COUNT_DAYS_AGO = 3
-SPLATOON2_LEAGUE_MATCH_RANKING_URI = 'https://app.splatoon2.nintendo.net/api/league_match_ranking/{}/JP'
 FIRST_TIME_OF_LEAGUE_MATCH = datetime(
     year=2017, month=7, day=21, hour=10, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
 
 MIN_SLEEP_SEC = 2
 MAX_SLEEP_SEC = 5
 AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR'
+OUTPUT_DIR = 'results'
+OUTPUT_FILE_FORMAT = 'league_ranking_{}.json'
 
 
-def _get_splatoon_ranking(match_date_uri):
-    r = requests.get(SPLATOON2_LEAGUE_MATCH_RANKING_URI.format(match_date_uri), cookies=COOKIES)
-    if r.status_code == 403 and r.json().get('code') == AUTHENTICATION_ERROR:
-        print("error: authentication error. make sure your iksm_session.")
-        sys.exit(1)
-    return r.text
-
-
-def _make_ranking_json(json_file, uri_time):
+def _make_ranking_json(sc, output_file, uri_time):
     try:
-        with open(json_file, 'w') as f:
-            f.write(_get_splatoon_ranking(uri_time))
-        print('processed:{}'.format(json_file))
+        with open(output_file, 'w') as f:
+            f.write(sc.get_league_ranking(uri_time))
+        print('processed:{}'.format(output_file))
     except:
         print("error: unexpected error is occured when writing json file.")
 
@@ -58,31 +53,34 @@ def _get_ranking_date_list():
     return ranking_date_list
 
 
-def _retrieve_ranking(ranking_date_list):
+def _retrieve_ranking(sc, ranking_date_list):
+    p = Path(OUTPUT_DIR)
+    if not p.exists() or not p.is_dir():
+        p.mkdir()
     for uri_time in progressbar.progressbar(ranking_date_list, redirect_stdout=True):
         # if json file already exists, skip processing
-        json_file = '{}.json'.format(uri_time)
-        if os.path.isfile(json_file):
+        output_file = '{}/{}'.format(OUTPUT_DIR,OUTPUT_FILE_FORMAT.format(uri_time))
+        pf = Path(output_file)
+        if pf.exists() and pf.is_file():
             try:
-                with open(json_file, 'r') as f:
+                with open(output_file, 'r') as f:
                     data = json.load(f)
                     if 'code' in data and data['code'] == "NOT_FOUND_ERROR":
-                        _make_ranking_json(json_file, uri_time)
+                        _make_ranking_json(sc, output_file, uri_time)
                     else:
-                        print('skipped:{}'.format(json_file))
+                        print('skipped:{}'.format(output_file))
                         continue
             except json.JSONDecodeError as e:
                 print('JSONDecodeError: ', e)
         else:
-            _make_ranking_json(json_file, uri_time)
+            _make_ranking_json(sc, output_file, uri_time)
         sleep_delay = random.randrange(MIN_SLEEP_SEC, MAX_SLEEP_SEC)
         time.sleep(sleep_delay)
 
 
 if __name__ == '__main__':
     if os.getenv("IKSM_SESSION"):
-        IKSM_SESSION = os.getenv("IKSM_SESSION")
-        COOKIES = dict(iksm_session=IKSM_SESSION)
+        iksm_session = os.getenv("IKSM_SESSION")
     else:
         print("error: environment IKSM_SESSION is required")
         sys.exit(1)
@@ -109,5 +107,6 @@ if __name__ == '__main__':
         start_time = FIRST_TIME_OF_LEAGUE_MATCH
     print('start time is {}'.format(start_time.strftime('%y%m%d%H')))
 
+    sc = splatoon.SplatoonClient(iksm_session)
     ranking_date_list = _get_ranking_date_list()
-    _retrieve_ranking(ranking_date_list)
+    _retrieve_ranking(sc, ranking_date_list)

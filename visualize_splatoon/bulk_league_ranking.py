@@ -15,8 +15,8 @@ from datetime import datetime, timezone, timedelta
 from elasticsearch import Elasticsearch, helpers, ElasticsearchException
 
 ELASTICSEARCH_URL = "localhost:9200"
-LEAGUE_RANKING_DIR = "../league_ranking"
-LEAGUE_RANKING_FILE_PATTERN = "*.json"
+LEAGUE_RANKING_DIR = "../collect_splatoon_data/results"
+LEAGUE_RANKING_FILE_PATTERN = "league_ranking_*.json"
 
 es = Elasticsearch(ELASTICSEARCH_URL)
 STAGE_LIST_JSON = "../stage_list/stage_history.json"

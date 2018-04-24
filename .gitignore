@@ -2,3 +2,5 @@ league_ranking/*.json
 festival_ranking/*.json
 stage_list/*.json
 .DS_store
+collect_splatoon_data/results/*.json
+collect_splatoon_data/__pycache__
