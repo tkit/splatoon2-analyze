@@ -17,7 +17,8 @@ import progressbar
 import os
 import sys
 from pathlib import Path
-import splatoon
+from splatoon import SplatoonClient
+from splatoon_exceptions import AuthenticationError, ValueError
 from datetime import datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=+9), 'JST')
@@ -37,6 +38,9 @@ def _make_ranking_json(sc, output_file, uri_time):
         with open(output_file, 'w') as f:
             f.write(sc.get_league_ranking(uri_time))
         print('processed:{}'.format(output_file))
+    except AuthenticationError as e:
+        print(e)
+        sys.exit(1)
     except:
         print("error: unexpected error is occured when writing json file.")
 
@@ -59,7 +63,7 @@ def _retrieve_ranking(sc, ranking_date_list):
         p.mkdir()
     for uri_time in progressbar.progressbar(ranking_date_list, redirect_stdout=True):
         # if json file already exists, skip processing
-        output_file = '{}/{}'.format(OUTPUT_DIR,OUTPUT_FILE_FORMAT.format(uri_time))
+        output_file = '{}/{}'.format(OUTPUT_DIR, OUTPUT_FILE_FORMAT.format(uri_time))
         pf = Path(output_file)
         if pf.exists() and pf.is_file():
             try:
@@ -79,12 +83,6 @@ def _retrieve_ranking(sc, ranking_date_list):
 
 
 if __name__ == '__main__':
-    if os.getenv("IKSM_SESSION"):
-        iksm_session = os.getenv("IKSM_SESSION")
-    else:
-        print("error: environment IKSM_SESSION is required")
-        sys.exit(1)
-
     now = datetime.now(timezone.utc)
 
     if len(sys.argv) == 1:  # default
@@ -107,6 +105,10 @@ if __name__ == '__main__':
         start_time = FIRST_TIME_OF_LEAGUE_MATCH
     print('start time is {}'.format(start_time.strftime('%y%m%d%H')))
 
-    sc = splatoon.SplatoonClient(iksm_session)
+    try:
+        sc = SplatoonClient()
+    except ValueError as e:
+        print(e)
+        sys.exit(1)
     ranking_date_list = _get_ranking_date_list()
     _retrieve_ranking(sc, ranking_date_list)
