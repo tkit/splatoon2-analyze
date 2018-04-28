@@ -6,6 +6,7 @@ splatoon2のapiにアクセスし、様々なデータを取得します。
 
 * `festival_ranking`: 過去のフェスマッチのランキング結果を取得し、json形式で保存します。
 * `league_ranking`: 過去のリーグマッチのランキング結果を取得し、json形式で保存します。
+* `stage_history`: splatoon2の過去のルール/ステージ一覧を整形してjson形式で保存します。
 
 # how to setup (common)
 
@@ -46,6 +47,17 @@ python get_league_ranking.py <days>
 * 高負荷アクセスを防ぐため、sleepが入っています。約6000件(約7ヶ月分)の取得で6hほどかかります。
 * リージョンは日本地域のみです。(マッピングするステージ情報がおそらく日本地域のみしか取得できないため)
 
+## stage_history
+
+```
+python get_stage_history.py <source_file>
+```
+
+`source_file` にはTwimeMachineから保存したHTMLのソースを指定します。
+
+結果は`results`ディレクトリ内に `stage_list.json` という形で保存されます。
+
+
 # another way (use Docker)
 
 ## build
@@ -59,5 +71,6 @@ docker build -t collect_splatoon_data .
 ```
 docker run --rm --name collect_splatoon_data -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app collect_splatoon_data:latest get_festival_ranking.py # festival_ranking
 docker run --rm --name collect_splatoon_data -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app collect_splatoon_data:latest get_league_ranking.py <days> # league_ranking
+docker run --rm --name collect_splatoon_data -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app collect_splatoon_data:latest get_stage_history.py <source_file> # stage_list
 ```
 

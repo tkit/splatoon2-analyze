@@ -19,8 +19,10 @@ LEAGUE_RANKING_DIR = "../collect_splatoon_data/results"
 LEAGUE_RANKING_FILE_PATTERN = "league_ranking_*.json"
 
 es = Elasticsearch(ELASTICSEARCH_URL)
-STAGE_LIST_JSON = "../stage_list/stage_history.json"
+STAGE_LIST_JSON = "../collect_splatoon_data/results/stage_history.json"
 JST = timezone(timedelta(hours=+9), 'JST')
+
+MAX_BULK_FILE_COUNT = 1000
 
 
 def _bulk_es_data(es, actions):
@@ -42,8 +44,8 @@ def _convert_stage_dict(list):
     stage_dict = {}
     for l in list:
         if 'mode' in l and l['mode'] == "リーグマッチ":
-            start_timestamp = datetime.strptime(l['start_time'], '%Y/%m/%d %H:%M %z').timestamp()
-            stage_dict[str(int(start_timestamp))] = {"rule": l['rule'], "stages": l['stages']}
+            start_timestamp = int(l['start_time'])
+            stage_dict[str(start_timestamp)] = {"rule": l['rule'], "stages": l['stages']}
         else:
             continue
     return stage_dict
@@ -94,10 +96,11 @@ def _make_bulk_data(stage_info, ranking_data, start_time, league_type):
 if __name__ == '__main__':
     stage_list = _load_league_stage_list(STAGE_LIST_JSON)
     stage_dict = _convert_stage_dict(stage_list)
-    p = Path(LEAGUE_RANKING_DIR)
     actions = []
-    for json_file in progressbar.progressbar(
-            list(p.glob(LEAGUE_RANKING_FILE_PATTERN)), redirect_stdout=True):
+    p = Path(LEAGUE_RANKING_DIR)
+    file_count = len(list(p.glob(LEAGUE_RANKING_FILE_PATTERN)))
+    for index, json_file in progressbar.progressbar(
+            enumerate(list(p.glob(LEAGUE_RANKING_FILE_PATTERN))), redirect_stdout=True):
         data = _load_league_ranking_file(json_file)
         if "code" in data and data['code'] == "NOT_FOUND_ERROR":
             continue
@@ -114,6 +117,8 @@ if __name__ == '__main__':
                 datetime.fromtimestamp(int(start_time), JST)))
             continue
 
-        actions = _make_bulk_data(stage_dict[start_time], data['rankings'], start_time,
-                                  league_type)
-        _bulk_es_data(es, actions)
+        actions.extend(
+            _make_bulk_data(stage_dict[start_time], data['rankings'], start_time, league_type))
+        if (index != 0 and index % MAX_BULK_FILE_COUNT == 0) or file_count == index:
+            _bulk_es_data(es, actions)
+            actions = []  # initialize

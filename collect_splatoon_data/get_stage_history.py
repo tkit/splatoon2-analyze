@@ -13,11 +13,13 @@ import json
 import os
 import sys
 import progressbar
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from html.parser import HTMLParser
 
 JST = timezone(timedelta(hours=+9), 'JST')
-STAGE_HISTORY_JSON_PATTERN = 'stage_history_{}.json'
+OUTPUT_DIR = 'results'
+OUTPUT_FILE = 'stage_history.json'
 
 
 class MyHTMLParser(HTMLParser):
@@ -63,7 +65,7 @@ def _get_match_date(pattern, data):
 
 def _make_match_dict(match_detail, match_date):
     stage_dict = {
-        "start_time": match_date.strftime('%Y/%m/%d %H:%M %z'),
+        "start_time": match_date.timestamp(),
         "mode": match_detail['mode'],
         "rule": match_detail['rule'],
         "stages": match_detail['stages']
@@ -75,7 +77,7 @@ def _get_nawabari_history(pattern, search_string):
     match = pattern.search(search_string)
     if match:
         stages = [{"name": s} for s in match.group(1).split("、")]
-        return {"mode": "ナワバリ", "rule": "ナワバリ", "stages": stages}
+        return {"mode": "レギュラーマッチ", "rule": "ナワバリバトル", "stages": stages}
 
 
 def _get_gachi_history(pattern, search_string):
@@ -131,36 +133,35 @@ def _make_stage_history(source_file):
     regex_fes = r'▼フェスマッチ\n(\S+)\n(\S+)\n(\S+)'
     pattern_fes = re.compile(regex_fes, re.MULTILINE)
 
-    stage_history = {}
+    stage_history = []
 
     for i in progressbar.progressbar(parsed_data, redirect_stdout=True):
         match_date = _get_match_date(pattern_date, i)
         if not match_date:
             continue
-        key = '{0:04d}{1:02d}'.format(match_date.year, match_date.month)
-        if not key in stage_history:
-            stage_history[key] = []
         match = _get_nawabari_history(pattern_nawabari, i['data'])
         if match:
-            stage_history[key].append(_make_match_dict(match, match_date))
+            stage_history.append(_make_match_dict(match, match_date))
         match = _get_gachi_history(pattern_gachi, i['data'])
         if match:
-            stage_history[key].append(_make_match_dict(match, match_date))
+            stage_history.append(_make_match_dict(match, match_date))
         match = _get_league_history(pattern_league, i['data'])
         if match:
-            stage_history[key].append(_make_match_dict(match, match_date))
+            stage_history.append(_make_match_dict(match, match_date))
         match = _get_fes_history(pattern_fes, i['data'])
         if match:
-            stage_history[key].append(_make_match_dict(match, match_date))
+            stage_history.append(_make_match_dict(match, match_date))
 
     return stage_history
 
 
 def _save_json(stage_history):
-    for yyyymm in progressbar.progressbar(stage_history.keys(), redirect_stdout=True):
-        output_json = STAGE_HISTORY_JSON_PATTERN.format(yyyymm)
-        with open(output_json, 'w') as f:
-            f.write(json.dumps(stage_history[yyyymm]))
+    p = Path(OUTPUT_DIR)
+    if not p.exists() or not p.is_dir():
+        p.mkdir()
+    output_file = '{}/{}'.format(OUTPUT_DIR, OUTPUT_FILE)
+    with open(output_file, 'w') as f:
+        f.write(json.dumps(stage_history, indent=4))
 
 
 if __name__ == '__main__':

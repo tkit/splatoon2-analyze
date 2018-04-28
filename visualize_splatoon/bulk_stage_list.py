@@ -1,33 +1,26 @@
 import json
 import progressbar
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from elasticsearch import Elasticsearch, helpers
 
 ELASTICSEARCH_URL = "localhost:9200"
-STAGE_LIST_DIR = "../stage_list"
-STAGE_LIST_FILE_PATTERN = "stage_history_*.json"
+STAGE_LIST_DIR = "../collect_splatoon_data/results"
+STAGE_LIST_FILE_PATTERN = "stage_history.json"
 
 es = Elasticsearch(ELASTICSEARCH_URL)
+JST = timezone(timedelta(hours=+9), 'JST')
 
 
 def _bulk_es(data):
     actions = [{
-        "timestamp":
-            datetime.strptime(d['start_time'], '%Y/%m/%d %H:%M %z'),
-        "mode":
-            d['mode'],
-        "rule":
-            d['rule'],
-        "stages":
-            d['stages'],
-        "_index":
-            "splatoon_stages",
-        "_type":
-            "stage_history",
-        "_id":
-            '{}_{}'.format(
-                datetime.strptime(d['start_time'], '%Y/%m/%d %H:%M %z').timestamp(), d['mode'])
+        "timestamp": datetime.fromtimestamp(int(d['start_time']), JST),
+        "mode": d['mode'],
+        "rule": d['rule'],
+        "stages": d['stages'],
+        "_index": "splatoon_stages",
+        "_type": "stage_history",
+        "_id": '{}_{}'.format(int(d['start_time']), d['mode'])
     } for d in data]
     helpers.bulk(es, actions)
 

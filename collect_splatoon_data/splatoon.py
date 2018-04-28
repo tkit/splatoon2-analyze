@@ -7,6 +7,7 @@ AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR'
 SPLATOON2_FESTIVAL_MATCH_RANKING_URI = 'https://app.splatoon2.nintendo.net/api/festivals/{}/rankings'
 SPLATOON2_FESTIVAL_HISTORY_URI = 'https://app.splatoon2.nintendo.net/api/festivals/pasts'
 SPLATOON2_LEAGUE_MATCH_RANKING_URI = 'https://app.splatoon2.nintendo.net/api/league_match_ranking/{}/JP'
+SPLATOON2_SCHEDULE_URI = 'https://app.splatoon2.nintendo.net/api/schedules'
 
 
 class SplatoonClient:
@@ -32,6 +33,9 @@ class SplatoonClient:
     def get_league_ranking(self, match_date_uri):
         return self._get_splatoon_request(
             SPLATOON2_LEAGUE_MATCH_RANKING_URI.format(match_date_uri)).text
+
+    def get_schedules(self):
+        return self._get_splatoon_request(SPLATOON2_SCHEDULE_URI).json()
 
     def _get_splatoon_request(self, url):
         r = requests.get(url, cookies=self.cookies)
