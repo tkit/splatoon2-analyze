@@ -45,7 +45,8 @@ def _convert_stage_dict(list):
     for l in list:
         if 'mode' in l and l['mode'] == "リーグマッチ":
             start_timestamp = int(l['start_time'])
-            stage_dict[str(start_timestamp)] = {"rule": l['rule'], "stages": l['stages']}
+            stage_dict[str(start_timestamp)] = {
+                "rule": l['rule'], "stages": l['stages']}
         else:
             continue
     return stage_dict
@@ -104,15 +105,15 @@ if __name__ == '__main__':
         data = _load_league_ranking_file(json_file)
         if "code" in data and data['code'] == "NOT_FOUND_ERROR":
             continue
-        if not "start_time" in data:
+        if "start_time" not in data:
             print("skipped because start_time isn't contained: {}".format(json_file))
             continue
         start_time = str(data['start_time'])
-        if not 'league_type' in data or not 'key' in data['league_type']:
+        if 'league_type' not in data or 'key' not in data['league_type']:
             print("skipped because league_type.key isn't contained: {}".format(json_file))
             continue
         league_type = data['league_type']['key']
-        if not start_time in stage_dict:
+        if start_time not in stage_dict:
             print('skipped because stage information is absent: {}'.format(
                 datetime.fromtimestamp(int(start_time), JST)))
             continue

@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+certifi = "==2018.1.18"
+chardet = "==3.0.4"
+idna = "==2.6"
+"progressbar2" = "==3.37.1"
+python-utils = "==2.3.0"
+requests = "==2.18.4"
+six = "==1.11.0"
+"urllib3" = "==1.22"
+
+[dev-packages]
+"flake8" = "*"
+"autopep8" = "*"
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+lint = "flake8 ."
+fix = "autopep8 -ivr ."
+sp_festival = "python get_festival_ranking.py"
+sp_league = "python get_league_ranking.py"
+sp_schedule = "python get_schedules.py"
+sp_stage = "python get_stage_history.py"

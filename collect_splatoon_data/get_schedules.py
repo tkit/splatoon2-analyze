@@ -3,35 +3,17 @@ Splatoon2のスケジュールを取得し、jsonファイルで保存するス�
 
 環境変数IKSM_SESSIONに各自のiksm_sessionを設定しておく必要あり
 
-usage: python get_schedule.py 
+usage: python get_schedule.py
 """
 
 import json
-import time
-import random
-import progressbar
-import os
 import sys
 from pathlib import Path
 from splatoon import SplatoonClient
 from splatoon_exceptions import AuthenticationError, ValueError
-from datetime import datetime, timezone, timedelta
 
-JST = timezone(timedelta(hours=+9), 'JST')
 OUTPUT_DIR = 'results'
 OUTPUT_FILE_FORMAT = 'schedule_{}.json'
-
-
-def _make_stage_history_json(sc, output_file):
-    try:
-        with open(output_file, 'w') as f:
-            f.write(sc.get_festival_ranking(fes_uri_part))
-        print('processed:{}'.format(output_file))
-    except AuthenticationError as e:
-        print(e)
-        sys.exit(1)
-    except:
-        print("error: unexpected error is occured when writing json file.")
 
 
 def _make_stage_history_map(schedules):
@@ -51,16 +33,19 @@ def _save_json(schedule):
     if not p.exists() or not p.is_dir():
         p.mkdir()
     for stages in schedule:
-        output_file = '{}/{}'.format(OUTPUT_DIR, OUTPUT_FILE_FORMAT.format(stages["start_time"]))
+        output_file = '{}/{}'.format(OUTPUT_DIR,
+                                     OUTPUT_FILE_FORMAT.format(stages["start_time"]))
         pf = Path(output_file)
         if pf.exists() and pf.is_file():
             try:
                 with open(output_file, 'r+') as f:
                     stage_history = json.load(f)
                     if stages in stage_history:
-                        print("skipped: stage {} already exists in {}".format(stages, output_file))
+                        print("skipped: stage {} already exists in {}".format(
+                            stages, output_file))
                     else:
-                        print("updated: stage {} added to {}".format(stages, output_file))
+                        print("updated: stage {} added to {}".format(
+                            stages, output_file))
                         stage_history.append(stages)
                         f.seek(0)
                         f.write(json.dumps(stage_history, indent=4))

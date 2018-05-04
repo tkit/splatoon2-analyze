@@ -36,7 +36,8 @@ class MyHTMLParser(HTMLParser):
             for attr in attrs:
                 if attr[0] == 'rel':
                     tweetdate = attr[1]
-                    dt = datetime.strptime(tweetdate, "%a %b %d %H:%M:%S %z %Y")
+                    dt = datetime.strptime(
+                        tweetdate, "%a %b %d %H:%M:%S %z %Y")
                     self.tweetdate = dt.astimezone(tz=JST)
 
     def handle_data(self, data):
@@ -169,7 +170,7 @@ if __name__ == '__main__':
         print("error: source file is required")
         sys.exit(1)
     source_file = sys.argv[1]
-    if os.path.isfile(source_file) == False:
+    if not os.path.isfile(source_file):
         print("error: source file is not found: {}".format(source_file))
         sys.exit(1)
 

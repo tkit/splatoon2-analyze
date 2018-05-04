@@ -1,7 +1,6 @@
 import requests
-import json
 import os
-from splatoon_exceptions import ValueError, AuthenticationError, SplatoonException
+from splatoon_exceptions import ValueError, AuthenticationError
 
 AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR'
 SPLATOON2_FESTIVAL_MATCH_RANKING_URI = 'https://app.splatoon2.nintendo.net/api/festivals/{}/rankings'

@@ -65,7 +65,7 @@ def _make_bulk_data(ranking_data, end_time):
                 "main_weapon": d['info']['weapon']['name'],
                 "sub_weapon": d['info']['weapon']['sub']['name'],
                 "special_weapon": d['info']['weapon']['special']['name']
-            },
+                    },
             "gear": [{
                 "part":
                     d['info']['head']['kind'],
@@ -101,10 +101,11 @@ if __name__ == '__main__':
     for json_file in progressbar.progressbar(
             list(p.glob(FESTIVAL_RANKING_FILE_PATTERN)), redirect_stdout=True):
         data = _load_festival_ranking_file(json_file)
-        if not "rankings" in data and not "alpha" in data['rankings'] and not isinstance(
+        if "rankings" not in data and "alpha" not in data['rankings'] and not isinstance(
                 data['rankings']['alpha'],
-                list) and not "updated_time" in data['rankings']['alpha'][0]:
-            print("skipped because this data isn't formatted structure: {}".format(json_file))
+                list) and "updated_time" not in data['rankings']['alpha'][0]:
+            print(
+                "skipped because this data isn't formatted structure: {}".format(json_file))
             continue
         end_time = int(str(json_file.name).split(".")[0].split("_")[2])
         end_time = datetime.fromtimestamp(int(end_time), JST)

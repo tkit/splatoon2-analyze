@@ -9,12 +9,10 @@ usage: python get_league_ranking.py 2 # from 2 days ago to now
 usage: python get_league_ranking.py # from 3 days ago(default) to now
 """
 
-import requests
 import json
 import time
 import random
 import progressbar
-import os
 import sys
 from pathlib import Path
 from splatoon import SplatoonClient
@@ -63,7 +61,8 @@ def _retrieve_ranking(sc, ranking_date_list):
         p.mkdir()
     for uri_time in progressbar.progressbar(ranking_date_list, redirect_stdout=True):
         # if json file already exists, skip processing
-        output_file = '{}/{}'.format(OUTPUT_DIR, OUTPUT_FILE_FORMAT.format(uri_time))
+        output_file = '{}/{}'.format(OUTPUT_DIR,
+                                     OUTPUT_FILE_FORMAT.format(uri_time))
         pf = Path(output_file)
         if pf.exists() and pf.is_file():
             try:
@@ -91,7 +90,7 @@ if __name__ == '__main__':
     elif len(sys.argv) > 2:
         print("error: param1 is required")
         sys.exit(1)
-    elif sys.argv[1].isdigit() == False:
+    elif not sys.argv[1].isdigit():
         print("error: param1 must be integer")
         sys.exit(1)
     elif int(sys.argv[1]) <= 0:

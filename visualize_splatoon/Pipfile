@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+elasticsearch = "*"
+"progressbar2" = "*"
+
+[dev-packages]
+"flake8" = "*"
+"autopep8" = "*"
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+lint = "flake8 ."
+fix = "autopep8 -ivr ."
+sp_bulk_festival = "python bulk_festival_ranking.py"
+sp_bulk_league = "python bulk_league_ranking.py"
+sp_bulk_stage = "python bulk_stage_list.py"

@@ -27,7 +27,9 @@ sh setup_es_templates.sh
 ### python setup
 
 ```
-pip install -r requirements.txt
+pip install pipenv
+pipenv install
+pipenv install --dev # for development
 ```
 
 # how to run

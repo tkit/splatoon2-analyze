@@ -7,11 +7,14 @@ splatoon2のapiにアクセスし、様々なデータを取得します。
 * `festival_ranking`: 過去のフェスマッチのランキング結果を取得し、json形式で保存します。
 * `league_ranking`: 過去のリーグマッチのランキング結果を取得し、json形式で保存します。
 * `stage_history`: splatoon2の過去のルール/ステージ一覧を整形してjson形式で保存します。
+* `schedule`: splatoon2の現在(から24時間先まで)のルール/ステージ一覧を整形してjson形式で保存します。
 
 # how to setup (common)
 
 ```
-pip install -r requirements.txt
+pip install pipenv
+pipenv install
+pipenv install --dev # for development
 ```
 
 # how to run
@@ -20,7 +23,7 @@ pip install -r requirements.txt
 
 ```
 export IKSM_SESSION=<your_iksm_session>
-python get_festival_ranking.py
+pipenv run sp_festival
 ```
 
 結果は`results`ディレクトリ内に `festival_ranking_<timestamp>.json` という形で保存されます。  
@@ -29,7 +32,7 @@ python get_festival_ranking.py
 
 ```
 export IKSM_SESSION=<your_iksm_session>
-python get_league_ranking.py <days>
+pipenv run sp_league <days>
 ```
 
 `days` には何日前(から現在まで)の結果を取得するかを指定します。指定しない場合はデフォルトの「3日前」が選択されます。
@@ -50,12 +53,20 @@ python get_league_ranking.py <days>
 ## stage_history
 
 ```
-python get_stage_history.py <source_file>
+pipenv run sp_stage <source_file>
 ```
 
 `source_file` にはTwimeMachineから保存したHTMLのソースを指定します。
 
 結果は`results`ディレクトリ内に `stage_list.json` という形で保存されます。
+
+## schedule
+
+```
+pipenv run sp_schedule
+```
+
+結果は`results`ディレクトリ内に `schedule_<timestamp>.json` という形で保存されます。
 
 
 # another way (use Docker)
@@ -72,5 +83,6 @@ docker build -t collect_splatoon_data .
 docker run --rm --name collect_splatoon_data -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app collect_splatoon_data:latest get_festival_ranking.py # festival_ranking
 docker run --rm --name collect_splatoon_data -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app collect_splatoon_data:latest get_league_ranking.py <days> # league_ranking
 docker run --rm --name collect_splatoon_data -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app collect_splatoon_data:latest get_stage_history.py <source_file> # stage_list
+docker run --rm --name collect_splatoon_data -e IKSM_SESSION=<your_iksm_session> -v $PWD:/app collect_splatoon_data:latest get_schedule.py # schedule
 ```
 

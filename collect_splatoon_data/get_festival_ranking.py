@@ -4,21 +4,18 @@ Splatoon2のフェスマッチランキングの結果を取得し、jsonファ�
 
 環境変数IKSM_SESSIONに各自のiksm_sessionを設定しておく必要あり
 
-usage: python get_festival_ranking.py 
+usage: python get_festival_ranking.py
 """
 
 import json
 import time
 import random
 import progressbar
-import os
 import sys
 from pathlib import Path
 from splatoon import SplatoonClient
 from splatoon_exceptions import AuthenticationError, ValueError
-from datetime import datetime, timezone, timedelta
 
-JST = timezone(timedelta(hours=+9), 'JST')
 MIN_SLEEP_SEC = 2
 MAX_SLEEP_SEC = 5
 OUTPUT_DIR = 'results'
@@ -54,7 +51,8 @@ def _retrieve_ranking(sc, festival_history):
     for fes in progressbar.progressbar(festival_history, redirect_stdout=True):
         fes_uri_part = fes['festival_id']
         # if json file already exists, skip processing
-        output_file = '{}/{}'.format(OUTPUT_DIR, OUTPUT_FILE_FORMAT.format(fes['end_time']))
+        output_file = '{}/{}'.format(OUTPUT_DIR,
+                                     OUTPUT_FILE_FORMAT.format(fes['end_time']))
         pf = Path(output_file)
         if pf.exists() and pf.is_file():
             try:
@@ -62,7 +60,8 @@ def _retrieve_ranking(sc, festival_history):
                     data = json.load(f)
                     if 'code' in data and (data['code'] == "INTERNAL_SERVER_ERROR" or
                                            data['code'] == "NOT_FOUND_ERROR"):
-                        print("error: {}, fes_end_time:{}".format(data['code'], fes['end_time']))
+                        print("error: {}, fes_end_time:{}".format(
+                            data['code'], fes['end_time']))
                         sys.exit(1)
                     else:
                         print('skipped: {}'.format(output_file))
